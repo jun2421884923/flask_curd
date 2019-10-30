@@ -1,0 +1,13 @@
+# Created by .ignore support plugin (hsz.mobi)
+.idea
+.gitignore
+.idea/vcs.xml
+.idea/workspace.xml
+day_seller_en/__init__.pyc
+day_seller_en/views.pyc
+settings.pyc
+util/__init__.pyc
+util/dblib.pyc
+util/dbutil.pyc
+util/decorator.pyc
+util/result.pyc
