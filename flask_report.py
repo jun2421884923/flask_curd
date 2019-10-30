@@ -53,13 +53,16 @@ def hello_world():
 #蓝图
 from day_seller_en import day_seller_en as day_seller_en_blueprint
 app.register_blueprint(day_seller_en_blueprint,url_prefix='/day_seller_en')
-
+from hour_adver_report import hour_adver_report as hour_adver_report_blueprint
+app.register_blueprint(hour_adver_report_blueprint,url_prefix='/hour_adver_report')
+from hour_adx_buyer_position import hour_adx_buyer_position as hour_adx_buyer_position_blueprint
+app.register_blueprint(hour_adx_buyer_position_blueprint,url_prefix='/hour_adx_buyer_position')
 #实现mvc  url和函数分离
 #app.add_url_rule('/foo', view_func=login_required(views.foo))
 
-# @app.errorhandler(404)
-# def not_fond(e):
-#     return render_template("404.html")
+@app.errorhandler(404)
+def not_fond(e):
+    return render_template("404.html")
 if __name__ == '__main__':
     currentdir = os.path.abspath(os.path.dirname(__file__))
     data_dir=os.path.join(currentdir,'data')
