@@ -16,6 +16,9 @@ class results(object):
     def set_data(self,data):
         self.__data=data
 
+    def set_resultMsg(self, msg):
+        self.__resultMsg = msg
+
     def get_statuscode(self):
         return self.__statuscode
     def get_resultMsg(self):

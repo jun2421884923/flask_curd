@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from . import hour_adver_report,logger
 from util.dbutil import MysqlUtil
 from util.decorator import jsonp,json_response
@@ -5,58 +7,73 @@ from util.common import conver_type
 from flask import jsonify,request,current_app
 import collections
 import json
+from validator import Required, Not, Truthy, Blank, Range, Equals, In, validate,Length
+
 from util.result import *
 @hour_adver_report.route('/', methods=['GET', 'POST'])
 def _hour_adver_report():
-    current_app.logger.info("_hour_adver_report_t //")
+    current_app.logger.info("_hour_adver_report /")
     return "hour_adver_report "
 @hour_adver_report.route('/get', methods=['GET', 'POST'])
 @jsonp
-def _hour_adver_report_test():
-    # print request.form["en"]
-    print request.args.keys()
+def _hour_adver_report_get():
     current_app.logger.info(request.url)
-    print current_app._get_current_object()
-    current_app.logger.info("current_app  _hour_adver_report_test")
-    logger.info(" logger  _hour_adver_report_test")
-    print "day get"
-    conn=MysqlUtil("adver")
-    result=results()
-    flag,res= conn.excute("""SELECT hab.buyerid,hab.day,hab.hour,hab.impid,asa.name,sum(hab.effective_imp) as imp,
-sum(hab.effective_click) as click,sum(effective_income) as effectincome,sum(position_request) as position_request,sum(position_bid) as position_bid ,sum(win) as win,CONCAT(format(sum(hab.timeout)/sum(hab.position_request)*100,2),"%") as 'timeoutrate'
-FROM `hour_adx_buyer_position` hab
-left join adx_ssp_adposition   asa 
-on hab.impid=asa.id 
-where 
-#day>=20190916
- buyerid in (1001)
- and day in (20191015)
-#buyerid in (1023,1066,1071,1003,1094)
-group by hab.buyerid,hab.day,hab.hour,hab.impid,asa.name""")
+    current_app.logger.info("current_app  _hour_adver_report  get")
+
+    rules = {
+        "startdate": [Required, Length(8, 8)],
+        "enddate": [Required, Length(8, 8)]
+    }
+    valid, errors = validate(rules, request.args)  #
+    current_app.logger.info(str(valid)+str(errors))
+
+    result = results()
+    # 参数校验
+    if not valid:
+        result.set_statuscode(1)
+        result.set_data(str(errors))
+        return jsonify(json.loads(str(result)))
+
+
+    conn = MysqlUtil("adver")
+    sql = """select t.day as day,hour,t.b,t.impid,b.name,t.a,e.name,t.request as request,t.start as start,t.imp as imp,t.click as click,t.clickratio as clickratio from (
+select  day,hour,b,impid,a,sum(imp) as imp,sum(click) as click,sum(click) / sum(imp) as clickratio,sum(request) as request,sum(start) as start from hour_adver_report  where day>=%s and day<=%s
+    """ % (request.args.get('startdate', None), request.args.get('enddate', None))
+    if request.args.get('b', None):
+        sql = sql + "  and  b in (%s)" % (request.args.get('b', None))
+    sql = sql + """
+      group by day,hour,b,impid,a
+) as t left join adx_ssp_adposition b on b.id=t.impid
+left join(
+select * from adver_ssp_strategy  union all select * from adver_ssp_strategy_sp)e on e.id=t.a  """
+    current_app.logger.info(sql)
+    print  sql
+    flag, res = conn.excute(sql)
     if flag:
-        data=[]
+        data = []
         for row in res:
-            dict_tmp=collections.defaultdict()
-            dict_tmp['buyerid']    = row[0]
-            dict_tmp['day']        = row[1]
-            dict_tmp['hour']       = row[2]
-            dict_tmp['impid']      = row[3]
-            dict_tmp['impidname']  = row[4]
-            dict_tmp['imp']        = row[5]
-            dict_tmp['click']      = row[6]
-            dict_tmp['effectincome']         = row[7]
-            dict_tmp['position_request']     =row[8]
-            dict_tmp['position_bid']         = row[9]
-            dict_tmp['win']         = row[10]
-            dict_tmp['timeoutrate'] = row[11]
-            for k,v in dict_tmp.items():
-                dict_tmp[k]=conver_type(v)
+            dict_tmp = collections.defaultdict()
+            dict_tmp['day'] = row[0]
+            dict_tmp['hour'] = row[1]
+            dict_tmp['b'] = row[2]
+            dict_tmp['impid'] = row[3]
+            dict_tmp['impidname'] = row[4]
+            dict_tmp['strategyid'] = row[5]
+            dict_tmp['strategyname'] = row[6]
+            dict_tmp['request'] = row[7]
+            dict_tmp['start'] = row[8]
+            dict_tmp['imp'] = row[9]
+            dict_tmp['click'] = row[10]
+            dict_tmp['clickrate'] = row[11]
+            for k, v in dict_tmp.items():
+                dict_tmp[k] = conver_type(v)
             data.append(dict_tmp)
+        print "取出的条数=" + str(len(data))
+        current_app.logger.info("取出的条数=" + str(len(data)))
         result.set_statuscode(0)
         result.set_data(data)
 
     else:
         result.set_statuscode(1)
-
-    current_app.logger.info("current_app"+str(result))
+        result.set_resultMsg(res + ":sql exec  fail！！！")
     return jsonify(json.loads(str(result)))

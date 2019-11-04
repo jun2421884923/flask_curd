@@ -2,8 +2,10 @@
 
 dbconfig={
     "adver":{
-        "host":'localhost',
-        "port":31067,
+        # "host":'10.16.193.195',
+        # "port":6150,
+        "host": 'localhost',
+        "port": 31067,
         "user":'video_adver_w',
         "password":'Ci4EWB84BnY5_ctw',
         "database":'video_adver'  #
@@ -23,6 +25,8 @@ dbconfig={
         "database": 'test1'
     },
     "self":{
+        # "host": '10.16.194.140',
+        # "port": 8888,
         "host": 'localhost',
         "port": 33063,
         "user": 'video_adver_w',

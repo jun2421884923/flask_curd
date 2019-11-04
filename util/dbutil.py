@@ -59,6 +59,7 @@ class MysqlUtil(object):
                 return True,results
         except Exception as e:
             print (e)
+            return False, str(e)
         return False,results
     def executeone(self,sql):
         try:
