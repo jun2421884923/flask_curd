@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import sys
 from util.dbutil import MysqlUtil
+import time
 reload(sys)
 sys.setdefaultencoding('utf-8')
 """
@@ -33,8 +34,14 @@ def test_valid():
     print errors
     print type(valid)
     print type(errors)
+def test(x):
+    sp = float(x) * 100
+    if sp < 0:
+        sp = 0
+    print str(sp)
 if __name__ == '__main__':
-    test_valid()
+    test(3.079352)
+    # test_valid()
     # conn=MysqlUtil("local1")
     # print conn.executeone("insert into user1 (name)values('user1')")
 
