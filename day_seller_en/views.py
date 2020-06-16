@@ -35,12 +35,7 @@ def _day_seller_en_get():
         return jsonify(json.loads(str(result)))
 
     conn = MysqlUtil("adver")
-    sql = """select   day,en,terminal,sum(oreq) as oreq ,sum(sreq) as sreq,sum(sres) as sres,sum(sans) as sans,
-sum(request)
- as request,sum(start) as start,sum(imp) as imp,sum(click) as click,sum(repository) as repository,
- sum(repository_max) as repository_max,sum(repository_30max) as repository_30max
-from day_sellerid_en 
-where day>=%s and day<=%s
+    sql = """s
         """ % (request.args.get('startdate', None), request.args.get('enddate', None))
     if request.args.get('en', None):
         sql = sql + "  and  en in ( '%s') " % (request.args.get('en', None))

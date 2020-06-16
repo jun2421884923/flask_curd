@@ -36,8 +36,7 @@ def _hour_adver_report_get():
 
 
     conn = MysqlUtil("adver")
-    sql = """select t.day as day,hour,t.b,t.impid,b.name,t.a,e.name,t.request as request,t.start as start,t.imp as imp,t.click as click,t.clickratio as clickratio from (
-select  day,hour,b,impid,a,sum(imp) as imp,sum(click) as click,sum(click) / sum(imp) as clickratio,sum(request) as request,sum(start) as start from hour_adver_report  where day>=%s and day<=%s
+    sql = """select day<=%s
     """ % (request.args.get('startdate', None), request.args.get('enddate', None))
     if request.args.get('b', None):
         sql = sql + "  and  b in (%s)" % (request.args.get('b', None))

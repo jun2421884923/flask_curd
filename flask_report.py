@@ -5,7 +5,7 @@ from flask import current_app
 from flask import jsonify
 reload(sys)
 sys.setdefaultencoding('utf-8')
-app = Flask(__name__)
+app = Flask(__name__,static_folder="templates")
 app.secret_key = b"qweq#.??daddadaqqe"
 # 获取logger实例，如果参数为空则返回root logger
 print __name__
@@ -59,6 +59,30 @@ from hour_adx_buyer_position import hour_adx_buyer_position as hour_adx_buyer_po
 app.register_blueprint(hour_adx_buyer_position_blueprint,url_prefix='/hour_adx_buyer_position')
 #实现mvc  url和函数分离
 #app.add_url_rule('/foo', view_func=login_required(views.foo))
+
+from jinja2 import Markup, Environment, FileSystemLoader
+from pyecharts.globals import CurrentConfig
+# 关于 CurrentConfig，可参考 [基本使用-全局变量]
+CurrentConfig.GLOBAL_ENV = Environment(loader=FileSystemLoader("./templates"))
+from pyecharts import options as opts
+from pyecharts.charts import Bar
+def bar_base() :
+    c = (
+        Bar()
+        .add_xaxis(["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子"])
+        .add_yaxis("商家A", [5, 20, 36, 10, 75, 90])
+        .add_yaxis("商家B", [15, 25, 16, 55, 48, 8])
+        .set_global_opts(title_opts=opts.TitleOpts(title="Bar-基本示例", subtitle="我是副标题"))
+    )
+    return c
+@app.route("/")
+def index():
+    c = bar_base()
+    return Markup(c.render_embed())
+
+
+
+
 
 @app.errorhandler(404)
 def not_fond(e):

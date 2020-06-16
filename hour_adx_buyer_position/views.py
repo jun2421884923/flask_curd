@@ -34,12 +34,7 @@ def _hour_adx_buyer_position_get():
         return jsonify(json.loads(str(result)))
 
     conn=MysqlUtil("adver")
-    sql="""SELECT hab.buyerid,hab.day,hab.hour,hab.impid,asa.name,sum(hab.effective_imp) as imp,
-sum(hab.effective_click) as click,sum(effective_income) as effectincome,sum(position_request) as position_request,sum(position_bid) as position_bid ,sum(win) as win,CONCAT(format(sum(hab.timeout)/sum(hab.position_request)*100,2),"%%") as 'timeoutrate'
-FROM `hour_adx_buyer_position` hab
-left join adx_ssp_adposition   asa 
-on hab.impid=asa.id 
-where 
+    sql="""SEL
 day>=%s  and day<=%s
 """%(request.args.get('startdate',None),request.args.get('enddate',None))
     if request.args.get('b',None):
